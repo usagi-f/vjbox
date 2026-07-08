@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browser-only audio-reactive VJ visualizer. Drop an audio file, get live visuals.">
+  <title>VJBOX — browser VJ toy</title>
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <div id="drop">
+    <h1>VJBOX</h1>
+    <div class="zone" id="zone">
+      <b>音楽ファイルをここにドロップ</b><br>
+      <small>または クリックして選択（mp3 / wav / ogg / m4a）</small>
+    </div>
+    <p>すべてブラウザ内で処理。音声データはどこにも送信されません。</p>
+    <input type="file" id="file" accept="audio/*" hidden>
+  </div>
+
+  <aside id="panel">
+    <div class="ptitle"><span>VISUAL CONTROL</span><div id="led"></div></div>
+
+    <div class="modes" id="modes"><!-- MODES から動的生成 --></div>
+
+    <div class="ctl"><label>感度 <output id="o-gain">1.20</output></label>
+      <input type="range" id="p-gain" min="0.4" max="3" step="0.05" value="1.2"></div>
+
+    <div class="ctl"><label>残像 <output id="o-trail">0.70</output></label>
+      <input type="range" id="p-trail" min="0" max="0.97" step="0.01" value="0.70"></div>
+
+    <div class="ctl"><label>フィードバック <output id="o-fb">0.00</output></label>
+      <input type="range" id="p-fb" min="0" max="1" step="0.01" value="0"></div>
+
+    <div class="row2">
+      <div class="ctl"><label>回転 <output id="o-rot">0.20</output></label>
+        <input type="range" id="p-rot" min="-1" max="1" step="0.01" value="0.2"></div>
+      <div class="ctl"><label>密度 <output id="o-dens">0.50</output></label>
+        <input type="range" id="p-dens" min="0" max="1" step="0.01" value="0.5"></div>
+    </div>
+
+    <div class="row2">
+      <div class="ctl"><label>色相 <output id="o-hue">190</output></label>
+        <input type="range" id="p-hue" min="0" max="360" step="1" value="190"></div>
+      <div class="ctl"><label>色の流れ <output id="o-flow">0.30</output></label>
+        <input type="range" id="p-flow" min="0" max="2" step="0.01" value="0.3"></div>
+    </div>
+
+    <div class="row2">
+      <div class="ctl"><label>ビート反応 <output id="o-punch">0.60</output></label>
+        <input type="range" id="p-punch" min="0" max="1" step="0.01" value="0.6"></div>
+      <div class="ctl"><label>ストロボ <output id="o-strobe">0.00</output></label>
+        <input type="range" id="p-strobe" min="0" max="1" step="0.01" value="0"></div>
+    </div>
+
+    <div class="seg" id="blendseg">
+      <button type="button" class="seglabel">合成</button>
+      <button type="button" data-v="lighter" class="on">ADD</button>
+      <button type="button" data-v="screen">SCR</button>
+      <button type="button" data-v="source-over">NRM</button>
+      <button type="button" data-v="difference">DIF</button>
+    </div>
+
+    <div class="seg" id="fbseg">
+      <button type="button" class="seglabel">FB型</button>
+      <button type="button" data-v="out" class="on">OUT</button>
+      <button type="button" data-v="in">IN</button>
+      <button type="button" data-v="spin">SPIN</button>
+      <button type="button" data-v="drift">DRFT</button>
+      <button type="button" data-v="mir">MIR</button>
+    </div>
+
+    <div class="seg" id="texseg">
+      <button type="button" class="seglabel">質感</button>
+      <button type="button" data-v="off" class="on">OFF</button>
+      <button type="button" data-v="scan">SCAN</button>
+      <button type="button" data-v="dot">DOT</button>
+    </div>
+
+    <div class="seg" id="sym">
+      <button type="button" class="seglabel">ミラー</button>
+      <button type="button" data-v="1" class="on">1</button>
+      <button type="button" data-v="2">2</button>
+      <button type="button" data-v="4">4</button>
+      <button type="button" data-v="6">6</button>
+    </div>
+
+    <div class="seg" id="autoseg">
+      <button type="button" class="seglabel">オート</button>
+      <button type="button" data-iv="0" class="on">OFF</button>
+      <button type="button" data-iv="8">8s</button>
+      <button type="button" data-iv="16">16s</button>
+      <button type="button" data-iv="32">32s</button>
+    </div>
+
+    <button type="button" id="rand">⚡ RANDOMIZE</button>
+  </aside>
+
+  <div id="transport">
+    <button type="button" id="play" title="再生/停止">▶</button>
+    <span id="ttime">0:00</span>
+    <input type="range" id="seek" min="0" max="1000" value="0">
+    <span id="tname"></span>
+    <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" title="音量">
+    <button type="button" id="eject" title="別の曲を読み込む">⏏</button>
+    <button type="button" id="fs" title="フルスクリーン">⛶</button>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
