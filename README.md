@@ -56,8 +56,8 @@ The project uses `decodeAudioData` -> `AudioBufferSourceNode` for playback rathe
 
 ### Adding a New Visual Mode
 
-1. `src/render/modes/mymode.ts` を作成し、`VisualMode` を実装する
-2. `src/render/modes/index.ts` の `MODES` 配列に追加する
+1. Create a new file `src/render/modes/mymode.ts` and implement the `VisualMode` interface.
+2. Register your mode by adding it to the `MODES` array in `src/render/modes/index.ts`.
 
 That’s it! The new mode will be integrated into the UI buttons, Autopilot, and crossfading system automatically.
 
