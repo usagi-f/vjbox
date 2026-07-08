@@ -1,74 +1,65 @@
 # VJBOX
 
-ブラウザだけで動くオーディオリアクティブVJビジュアライザ。
-音楽ファイルをドロップすると、スペクトル解析とビート検出に連動した映像がリアルタイムに生成されます。
-サーバー不要・完全クライアントサイド処理のため、音声データはどこにも送信されません。
+An audio-reactive VJ visualizer that runs entirely in your browser.
+Simply drop an audio file into the window to generate real-time visuals fully synchronized with spectral analysis and beat detection.
+No server required. Features 100% client-side processing, ensuring your audio data never leaves your machine.
 
 ## Features
 
-- **16 visual modes** — RADIAL / PRTCL / TUNNEL / WAVE / GRID / LISSA / BURST / RIDGE / SPIRAL / CUBES / PLEXUS / RAIN / GLITCH / BLOB / FLOOR / FLASH
-- **グローバル演出パラメータ** — 合成モード(加算/スクリーン/通常/差分)、フィードバック型(OUT/IN/SPIN/DRIFT/MIR)、質感オーバーレイ(走査線/網点)、ビートストロボ。モードと直交して掛け合わせられるため、組合せは数千通り
-- **GUIリアルタイム操作** — 感度・残像・回転・密度・色相・万華鏡ミラーなどをスライダーで操作
-- **オートパイロット** — 指定間隔でビートに同期してモードをクロスフェード切替。合間も2秒ごとにパラメータが滑らかに揺らぎ続ける
-- **ビート検出** — 低域エネルギーの移動平均比較によるオンセット検出
-- **壁投影モード** — フルスクリーン + 3秒放置でUI自動非表示
+- **16 Visual Modes** — RADIAL / PRTCL / TUNNEL / WAVE / GRID / LISSA / BURST / RIDGE / SPIRAL / CUBES / PLEXUS / RAIN / GLITCH / BLOB / FLOOR / FLASH
+- **Global Effects & Parameters** — Blending modes (Add / Screen / Normal / Difference), feedback types (OUT / IN / SPIN / DRIFT / MIR), texture overlays (Scanlines / Halftone), and a beat-synced strobe. Since these layer orthogonally over the visual modes, you can create thousands of unique combinations.
+- **Real-Time GUI Control** — Adjust sensitivity, feedback trails, rotation, density, hue, kaleidoscope mirrors, and more via intuitive sliders.
+- **Autopilot Mode** — Crossfades between visual modes automatically in sync with the beat at specified intervals. While running, parameters continuously and smoothly drift every 2 seconds to keep the performance dynamic.
+- **Beat Detection** — Onset detection powered by moving-average comparisons of low-frequency energy.
+- **Wall Projection Mode** — Full-screen mode automatically hides the UI after 3 seconds of inactivity.
 
 ## Usage
 
-https://&lt;username&gt;.github.io/vjbox/ を開き、音声ファイル(mp3/wav/ogg/m4a)をドロップするだけ。
+Drag and drop any audio file (`mp3` / `wav` / `ogg` / `m4a`).
 
-- `Space` — 再生/停止
-- `⚡ RANDOMIZE` — 全パラメータをガチャ
-- `オート 8s/16s/32s` — 自動VJモード
+- `Space` — Play / Pause
+- `⚡ RANDOMIZE` — Roll the dice on all parameters
+- `Auto 8s/16s/32s` — Toggle Autopilot VJ mode
 
 ## Development
 
 ```bash
 npm ci
-npm run dev      # 開発サーバー
-npm run build    # 型チェック + dist/ へビルド
-npm run preview  # ビルド結果の確認
+npm run dev      # Start the local development server
+npm run build    # Run type checks and build assets into dist/
+npm run preview  # Preview the production build locally
 ```
 
 ## Architecture
 
 ```
 src/
-├─ main.ts               エントリポイント
+├─ main.ts               Entry point
 ├─ state/
-│  ├─ bus.ts             最小イベントバス(モジュール間の疎結合通知)
-│  └─ params.ts          パラメータストア + グライド(滑らかな目標値追従)
+│  ├─ bus.ts             Minimal event bus (loosely coupled notifications between modules)
+│  └─ params.ts          Parameter store + Glide (smooth target-value interpolation)
 ├─ audio/
-│  ├─ player.ts          decodeAudioData ベースの再生エンジン
-│  └─ analyzer.ts        FFT + ビート検出
+│  ├─ player.ts          Playback engine based on decodeAudioData
+│  └─ analyzer.ts        FFT + Beat detection
 ├─ render/
-│  ├─ renderer.ts        描画パイプライン(FB → 残像 → モード → 質感 → ストロボ)
-│  ├─ context.ts         Frame / VisualMode インターフェース
-│  └─ modes/             1ファイル1モード。index.ts の配列に足すだけで追加できる
+│  ├─ renderer.ts        Rendering pipeline (FB → Trails → Mode → Texture → Strobe)
+│  ├─ context.ts         Frame / VisualMode interfaces
+│  └─ modes/             One file per mode. Easily add new ones by appending to the index.ts array
 ├─ auto/
-│  └─ director.ts        オートパイロット(モード切替 + パラメータ揺らぎ)
+│  └─ director.ts        Autopilot manager (mode transitions + parameter drifting)
 └─ ui/                   panel / transport / dropzone / idle
 ```
 
-技術選定: Vite + TypeScript、ランタイム依存ゼロ。
-描画は Canvas 2D で、フィードバックはキャンバス自己コピーで実現しています。
-`<audio>` 要素を使わず `decodeAudioData` → `AudioBufferSourceNode` で再生しているのは、
-CSP が厳しい埋め込み環境でも動作させるためです。
+Tech Stack: Built with Vite and TypeScript, featuring zero runtime dependencies.
+Rendering is handled via Canvas 2D, and feedback loops are achieved through canvas self-copying.
+The project uses `decodeAudioData` -> `AudioBufferSourceNode` for playback rather than a standard `<audio>` element. This ensures seamless operation even in embedded environments with strict Content Security Policies (CSP).
 
-### モードの追加方法
+### Adding a New Visual Mode
 
 1. `src/render/modes/mymode.ts` を作成し、`VisualMode` を実装する
 2. `src/render/modes/index.ts` の `MODES` 配列に追加する
 
-これだけでUIボタン・オートパイロット・クロスフェードすべてに自動で組み込まれます。
-
-## Deploy (GitHub Pages)
-
-`.github/workflows/deploy.yml` 同梱。以下の手順で公開できます。
-
-1. GitHubにリポジトリを作成して push
-2. リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に変更
-3. main に push するたびに自動でビルド & デプロイ
+That’s it! The new mode will be integrated into the UI buttons, Autopilot, and crossfading system automatically.
 
 ## License
 
