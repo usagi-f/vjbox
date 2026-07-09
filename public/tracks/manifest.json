@@ -1,10 +1,10 @@
 {
   "tracks": [
-    { "file": "01_Sample_Music", "name": "01_Sample_Music" },
-    { "file": "02_Sample_Music", "name": "02_Sample_Music" },
-    { "file": "03_Sample_Music", "name": "03_Sample_Music" },
-    { "file": "04_Sample_Music", "name": "04_Sample_Music" },
-    { "file": "05_Sample_Music", "name": "05_Sample_Music" },
-    { "file": "06_Sample_Music", "name": "06_Sample_Music" }
+    { "file": "01_Sample_Music.mp3", "name": "01_Sample_Music" },
+    { "file": "02_Sample_Music.mp3", "name": "02_Sample_Music" },
+    { "file": "03_Sample_Music.mp3", "name": "03_Sample_Music" },
+    { "file": "04_Sample_Music.mp3", "name": "04_Sample_Music" },
+    { "file": "05_Sample_Music.mp3", "name": "05_Sample_Music" },
+    { "file": "06_Sample_Music.mp3", "name": "06_Sample_Music" }
   ]
 }
