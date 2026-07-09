@@ -47,12 +47,16 @@ export class Player {
   }
 
   async load(file: File): Promise<void> {
+    await this.loadArrayBuffer(await file.arrayBuffer(), file.name);
+  }
+
+  /** URL 取得や File 以外の経路からも同じデコード再生ができるようにする */
+  async loadArrayBuffer(data: ArrayBuffer, name: string): Promise<void> {
     this.init();
     if (this.ctx!.state === "suspended") await this.ctx!.resume().catch(() => {});
-    const buf = await file.arrayBuffer();
     this.pause();
-    this.buffer = await this.ctx!.decodeAudioData(buf);
-    this.name = file.name;
+    this.buffer = await this.ctx!.decodeAudioData(data);
+    this.name = name;
     this.play(0);
     emit("player:loaded");
   }
@@ -75,6 +79,7 @@ export class Player {
       this.playing = false;
       this.offset = 0;
       emit("player:state");
+      emit("player:ended");
     };
     node.start(0, this.offset);
     this.node = node;

@@ -13,11 +13,22 @@
     <h1>VJBOX</h1>
     <div class="zone" id="zone">
       <b>音楽ファイルをここにドロップ</b><br>
-      <small>または クリックして選択（mp3 / wav / ogg / m4a）</small>
+      <small>複数ファイルでプレイリストを作成（mp3 / wav / ogg / m4a）</small>
     </div>
+    <button type="button" id="drop-start" hidden>▶ 標準プレイリストを再生</button>
     <p>すべてブラウザ内で処理。音声データはどこにも送信されません。</p>
-    <input type="file" id="file" accept="audio/*" hidden>
+    <input type="file" id="file" accept="audio/*" multiple hidden>
   </div>
+
+  <aside id="playlist">
+    <div class="ptitle"><span>PLAYLIST</span>
+      <div class="pl-tools">
+        <button type="button" id="pl-shuffle" title="シャッフル">🔀</button>
+        <button type="button" id="pl-add" title="曲を追加">＋</button>
+      </div>
+    </div>
+    <ol id="pl-list"><!-- playlist から動的生成 --></ol>
+  </aside>
 
   <aside id="panel">
     <div class="ptitle"><span>VISUAL CONTROL</span><div id="led"></div></div>
@@ -98,7 +109,10 @@
   </aside>
 
   <div id="transport">
+    <button type="button" id="prev" title="前の曲">⏮</button>
     <button type="button" id="play" title="再生/停止">▶</button>
+    <button type="button" id="next" title="次の曲">⏭</button>
+    <button type="button" id="shuffle" title="シャッフル">🔀</button>
     <span id="ttime">0:00</span>
     <input type="range" id="seek" min="0" max="1000" value="0">
     <span id="tname"></span>

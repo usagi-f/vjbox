@@ -1,18 +1,18 @@
 import { on } from "../state/bus";
-import { player } from "../audio/player";
-
-const AUDIO_EXT = /\.(mp3|wav|ogg|m4a|flac|aac)$/i;
+import { playlist, isAudioFile } from "../audio/playlist";
 
 export function initDropzone(): void {
   const drop = document.getElementById("drop")!;
   const zone = document.getElementById("zone")!;
   const input = document.getElementById("file") as HTMLInputElement;
+  const startBtn = document.getElementById("drop-start") as HTMLButtonElement;
 
-  async function load(file: File | undefined | null): Promise<void> {
-    if (!file) return;
+  function addFiles(files: File[]): void {
+    const audio = files.filter(isAudioFile);
+    if (!audio.length) return;
     zone.innerHTML = "<b>DECODING…</b>";
     try {
-      await player.load(file);
+      playlist.add(audio);
     } catch (err) {
       console.error(err);
       zone.innerHTML =
@@ -21,7 +21,10 @@ export function initDropzone(): void {
   }
 
   zone.addEventListener("click", () => input.click());
-  input.addEventListener("change", () => void load(input.files?.[0]));
+  input.addEventListener("change", () => {
+    addFiles([...(input.files ?? [])]);
+    input.value = "";
+  });
 
   addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -31,11 +34,26 @@ export function initDropzone(): void {
   addEventListener("drop", (e) => {
     e.preventDefault();
     drop.classList.remove("over");
-    const f = [...(e.dataTransfer?.files ?? [])].find(
-      (f) => f.type.startsWith("audio") || AUDIO_EXT.test(f.name),
-    );
-    void load(f);
+    addFiles([...(e.dataTransfer?.files ?? [])]);
   });
 
+  /* 標準プレイリストが読み込まれたら「▶ 標準再生」ボタンを出す */
+  const refreshStart = (): void => {
+    const builtin = playlist.list().filter((t) => t.src.kind === "url");
+    if (builtin.length && playlist.currentId === null) {
+      startBtn.hidden = false;
+      startBtn.textContent = `▶ 標準プレイリストを再生 (${builtin.length}曲)`;
+    } else {
+      startBtn.hidden = true;
+    }
+  };
+  startBtn.addEventListener("click", () => {
+    const first = playlist.list().find((t) => t.src.kind === "url");
+    if (first) void playlist.playId(first.id);
+  });
+  on("playlist:changed", refreshStart);
+  on("track:changed", refreshStart);
+
+  /* 何か1曲でも再生され始めたらドロップ画面を隠す */
   on("player:loaded", () => drop.classList.add("hidden"));
 }

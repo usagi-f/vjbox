@@ -36,6 +36,54 @@
   #drop .zone b{color:var(--txt);font-weight:400}
   #drop small{color:#3a3a48;letter-spacing:.05em}
 
+  #drop-start{
+    padding:10px 22px;border-radius:8px;cursor:pointer;
+    background:none;border:1px solid var(--acc);color:var(--acc);
+    font-family:var(--mono);letter-spacing:.12em;font-size:13px;transition:all .15s;
+  }
+  #drop-start:hover{background:var(--acc);color:#0a0a0e}
+
+  /* ---------- playlist panel ---------- */
+  #playlist{
+    position:fixed;top:12px;left:12px;width:236px;z-index:20;
+    background:color-mix(in srgb, var(--panel) 88%, transparent);
+    border:1px solid var(--panel-edge);border-radius:10px;
+    backdrop-filter:blur(8px);
+    padding:12px 14px 14px;
+    transition:opacity .4s, transform .4s;
+    max-height:calc(100vh - 96px);display:flex;flex-direction:column;
+  }
+  #playlist .ptitle{margin-bottom:8px}
+  .pl-tools{display:flex;gap:4px}
+  .pl-tools button{
+    background:#16161c;border:1px solid var(--panel-edge);color:var(--dim);
+    font-family:var(--mono);font-size:11px;width:24px;height:22px;border-radius:5px;cursor:pointer;
+  }
+  .pl-tools button:hover{color:var(--txt)}
+  .pl-tools button.on{color:#0a0a0e;background:var(--acc);border-color:var(--acc)}
+
+  #pl-list{list-style:none;overflow-y:auto;margin:0;padding:0}
+  #pl-list::-webkit-scrollbar{width:4px}
+  #pl-list::-webkit-scrollbar-thumb{background:#26262f;border-radius:2px}
+  .pl-empty{color:#3a3a48;text-align:center;padding:14px 4px;letter-spacing:.05em}
+  .pl-item{
+    display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:6px;
+    cursor:pointer;color:var(--dim);transition:background .12s,color .12s;
+    border:1px solid transparent;
+  }
+  .pl-item:hover{background:#16161c;color:var(--txt)}
+  .pl-item.on{color:var(--acc)}
+  .pl-item.on .pl-idx{color:var(--acc)}
+  .pl-item.dragging{opacity:.4}
+  .pl-item.drag-over{border-color:var(--acc)}
+  .pl-idx{flex:0 0 16px;text-align:right;color:#3a3a48;font-variant-numeric:tabular-nums;font-size:10px}
+  .pl-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+  .pl-del{
+    flex:0 0 auto;background:none;border:none;color:#3a3a48;cursor:pointer;
+    font-family:var(--mono);font-size:14px;line-height:1;padding:0 2px;
+  }
+  .pl-del:hover{color:var(--acc)}
+
   /* ---------- control panel ---------- */
   #panel{
     position:fixed;top:12px;right:12px;width:248px;z-index:20;
@@ -112,10 +160,11 @@
   #ttime{color:var(--dim);font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap}
   #vol{width:64px}
 
-  body.idle #panel, body.idle #transport{opacity:0;pointer-events:none}
+  body.idle #panel, body.idle #transport, body.idle #playlist{opacity:0;pointer-events:none}
   body.idle{cursor:none}
 
   @media (max-width:640px){
     #panel{width:calc(100vw - 24px);top:auto;bottom:66px;max-height:44vh}
+    #playlist{width:calc(100vw - 24px);max-height:32vh}
     #tname{display:none}
   }
