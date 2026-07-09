@@ -1,13 +1,13 @@
-# 標準プレイリスト (Default Playlist)
+# Default Playlist
 
-このフォルダに置いた音源が「標準プレイリスト」になります。ページを開くと
-ランディング画面に **▶ 標準プレイリストを再生** ボタンが表示され、クリックすると
-連続再生が始まります。
+Audio placed in this folder becomes the **default playlist**. When the page
+loads, a **▶ Play default playlist** button appears on the landing screen, and
+clicking it starts continuous playback.
 
-## 曲を追加する手順
+## Adding tracks
 
-1. mp3（wav / ogg / m4a も可）ファイルをこのフォルダ（`public/tracks/`）に置く。
-2. `manifest.json` の `tracks` 配列にエントリを追記する。
+1. Put audio files (`mp3`, or `wav` / `ogg` / `m4a`) in this folder (`public/tracks/`).
+2. Add an entry for each file to the `tracks` array in `manifest.json`.
 
 ```json
 {
@@ -18,13 +18,14 @@
 }
 ```
 
-- `file` … このフォルダからの相対ファイル名（必須）。
-- `name` … プレイリストに表示する曲名（省略時は `file` を表示）。
+- `file` — the file name relative to this folder (required).
+- `name` — the label shown in the playlist (falls back to `file` when omitted).
 
-`tracks` が空の場合、標準プレイリストは無し（従来どおりドロップで再生）になります。
+When `tracks` is empty, there is no default playlist (playback works as before,
+by dropping files).
 
-## 補足
+## Notes
 
-- `public/` 配下は Vite がビルド時に `dist/` へそのままコピーします。
-- 配列の並び順がそのまま再生順（連続再生）になります。
-- リポジトリに同梱するファイルのライセンス（配布・再生の権利）にご注意ください。
+- Vite copies everything under `public/` verbatim into `dist/` at build time.
+- The array order is the playback order for continuous playback.
+- Mind the license (distribution and playback rights) of any files you commit.
