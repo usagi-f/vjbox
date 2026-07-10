@@ -28,7 +28,7 @@ import { petals } from "./petals";
 import { vortex } from "./vortex";
 import { cometsMode } from "./comets";
 import { diamonds } from "./diamonds";
-import { typo } from "./typo";
+import { radar } from "./radar";
 import { pipes } from "./pipes";
 import { nebula } from "./nebula";
 
@@ -41,7 +41,7 @@ export const MODES: VisualMode[] = [
   rings, stars, bars, orbit,
   mesh, shards, helix, moire,
   lasers, petals, vortex, cometsMode,
-  diamonds, typo, pipes, nebula,
+  diamonds, radar, pipes, nebula,
 ];
 
 export const MODE_BY_ID = new Map(MODES.map((m) => [m.id, m]));
