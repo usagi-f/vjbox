@@ -80,6 +80,7 @@ const VARIATIONS: Array<() => void> = [
   () => glideNum("hue", P.hue + rnd(60, 160) * (Math.random() < 0.5 ? -1 : 1)),
   () => glideNum("strobe", +(Math.random() < 0.35 ? rnd(0.2, 0.7) : 0).toFixed(2)),
   () => randDiscrete("sym"),
+  () => randDiscrete("vari"),
   () => randDiscrete("blend"),
   () => randDiscrete("fbStyle"),
   () => randDiscrete("tex"),
@@ -110,6 +111,7 @@ function switchMode(): void {
   if (Math.random() < 0.25) randDiscrete("tex");
   const syms = [1, 1, 2, 4, 6];
   setDiscrete("sym", syms[Math.floor(Math.random() * syms.length)]);
+  setDiscrete("vari", 1 + Math.floor(Math.random() * 3));
 }
 
 /** ⚡RANDOMIZE: モードもパラメータも一気にガチャ(カット的な演出) */
@@ -130,4 +132,5 @@ export function randomizeAll(): void {
   if (Math.random() < 0.4) randDiscrete("tex");
   const syms = [1, 2, 4, 6];
   setDiscrete("sym", syms[Math.floor(Math.random() * syms.length)]);
+  setDiscrete("vari", 1 + Math.floor(Math.random() * 3));
 }

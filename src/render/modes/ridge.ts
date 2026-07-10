@@ -1,6 +1,6 @@
 import type { VisualMode } from "../context";
 
-/** スペクトル履歴を奥から手前へ流す稜線ランドスケープ */
+/** スペクトル履歴を奥から手前へ流す稜線ランドスケープ。vari: 1=線 / 2=山の塗り / 3=点描 */
 const COLS = 96;
 const ROWS = 44;
 const terrain: Float32Array[] = [];
@@ -37,14 +37,37 @@ export const ridge: VisualMode = {
       const amp = H * 0.17 * (1 - d * 0.72) * (1 + (j === 0 ? a.beatEnv * p.punch * 0.6 : 0));
       cx.strokeStyle = `hsla(${h0 + d * 70} 85% ${62 - d * 28}% / ${1 - d * 0.82})`;
       cx.lineWidth = (2.4 - d * 1.8) * DPR;
-      cx.beginPath();
-      for (let i = 0; i < COLS; i++) {
-        const x = mx + (i / (COLS - 1)) * (W - 2 * mx);
-        const env = Math.sin((i / (COLS - 1)) * Math.PI); /* 中央を高く */
-        const y = yb - rw[i] * amp * (0.3 + env * 0.95);
-        if (i) cx.lineTo(x, y); else cx.moveTo(x, y);
+      if (p.vari === 3) {
+        /* 頂点を光点で打つ点描地形 */
+        cx.fillStyle = `hsla(${h0 + d * 70} 85% ${62 - d * 28}% / ${1 - d * 0.8})`;
+        for (let i = 0; i < COLS; i += 2) {
+          const x = mx + (i / (COLS - 1)) * (W - 2 * mx);
+          const env = Math.sin((i / (COLS - 1)) * Math.PI);
+          const y = yb - rw[i] * amp * (0.3 + env * 0.95);
+          cx.beginPath();
+          cx.arc(x, y, (0.8 + rw[i] * 2.4) * (2 - d) * DPR, 0, Math.PI * 2);
+          cx.fill();
+        }
+      } else {
+        cx.beginPath();
+        for (let i = 0; i < COLS; i++) {
+          const x = mx + (i / (COLS - 1)) * (W - 2 * mx);
+          const env = Math.sin((i / (COLS - 1)) * Math.PI); /* 中央を高く */
+          const y = yb - rw[i] * amp * (0.3 + env * 0.95);
+          if (i) cx.lineTo(x, y); else cx.moveTo(x, y);
+        }
+        if (p.vari === 2) {
+          /* 手前を塗り潰して山のシルエットにする(奥の線を隠す) */
+          cx.lineTo(mx + (W - 2 * mx), yb);
+          cx.lineTo(mx, yb);
+          cx.closePath();
+          cx.globalCompositeOperation = "source-over";
+          cx.fillStyle = `hsla(${h0 + d * 70} 55% ${7 + (1 - d) * 6}% / .92)`;
+          cx.fill();
+          cx.globalCompositeOperation = p.blend;
+        }
+        cx.stroke();
       }
-      cx.stroke();
     }
     cx.restore();
   },

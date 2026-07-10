@@ -13,6 +13,7 @@ const NUM_KEYS: Array<{ key: NumKey; dec: number }> = [
 
 const SEGS: Array<{ id: string; key: DiscreteKey }> = [
   { id: "sym", key: "sym" },
+  { id: "variseg", key: "vari" },
   { id: "blendseg", key: "blend" },
   { id: "fbseg", key: "fbStyle" },
   { id: "texseg", key: "tex" },
@@ -78,7 +79,7 @@ export function initPanel(): void {
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-v]");
       if (!b) return;
       const raw = b.dataset.v!;
-      setDiscrete(key, (key === "sym" ? +raw : raw) as never);
+      setDiscrete(key, (key === "sym" || key === "vari" ? +raw : raw) as never);
     });
   }
   on("param:discrete", (payload) => {

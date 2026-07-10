@@ -7,7 +7,7 @@ interface Ring {
 const rings: Ring[] = [];
 let ringTimer = 0;
 
-/** 多角形リングが迫ってくるトンネル */
+/** 多角形リングが迫ってくるトンネル。vari: 1=多角形 / 2=星形 / 3=破線円 */
 export const tunnel: VisualMode = {
   id: "tunnel",
   label: "TUNNEL",
@@ -41,16 +41,43 @@ export const tunnel: VisualMode = {
       cx.rotate(r.rot);
       cx.strokeStyle = `hsla(${r.hue} 90% ${45 + fade * 25}% / ${fade})`;
       cx.lineWidth = r.w * (1 + a.beatEnv * p.punch);
-      cx.beginPath();
-      for (let s = 0; s <= r.sides; s++) {
-        const ang = (s / r.sides) * Math.PI * 2;
-        const wob = 1 + (freq[(s * 13) % 64] / 255 - 0.5) * 0.25 * p.gain;
-        const x = Math.cos(ang) * r.r * wob;
-        const y = Math.sin(ang) * r.r * wob;
-        if (s) cx.lineTo(x, y); else cx.moveTo(x, y);
+      if (p.vari === 2) {
+        /* 内外の半径を交互に取る星形 */
+        cx.beginPath();
+        const pts = r.sides * 2;
+        for (let s = 0; s <= pts; s++) {
+          const ang = (s / pts) * Math.PI * 2;
+          const rr = r.r * (s % 2 === 0 ? 1 : 0.55);
+          const wob = 1 + (freq[(s * 13) % 64] / 255 - 0.5) * 0.25 * p.gain;
+          const x = Math.cos(ang) * rr * wob;
+          const y = Math.sin(ang) * rr * wob;
+          if (s) cx.lineTo(x, y); else cx.moveTo(x, y);
+        }
+        cx.closePath();
+        cx.stroke();
+      } else if (p.vari === 3) {
+        /* 隙間のある円弧セグメント */
+        const gap = 0.35 / r.sides;
+        for (let s = 0; s < r.sides; s++) {
+          const a0 = (s / r.sides) * Math.PI * 2;
+          const a1 = ((s + 1) / r.sides) * Math.PI * 2;
+          const wob = 1 + (freq[(s * 13) % 64] / 255 - 0.5) * 0.25 * p.gain;
+          cx.beginPath();
+          cx.arc(0, 0, r.r * wob, a0 + gap, a1 - gap);
+          cx.stroke();
+        }
+      } else {
+        cx.beginPath();
+        for (let s = 0; s <= r.sides; s++) {
+          const ang = (s / r.sides) * Math.PI * 2;
+          const wob = 1 + (freq[(s * 13) % 64] / 255 - 0.5) * 0.25 * p.gain;
+          const x = Math.cos(ang) * r.r * wob;
+          const y = Math.sin(ang) * r.r * wob;
+          if (s) cx.lineTo(x, y); else cx.moveTo(x, y);
+        }
+        cx.closePath();
+        cx.stroke();
       }
-      cx.closePath();
-      cx.stroke();
       cx.restore();
     }
   },

@@ -1,6 +1,6 @@
 import type { VisualMode } from "../context";
 
-/** 円形スペクトラムバー */
+/** 円形スペクトラムバー。vari: 1=バー / 2=パール / 3=ウェッジ */
 export const radial: VisualMode = {
   id: "radial",
   label: "RADIAL",
@@ -21,12 +21,32 @@ export const radial: VisualMode = {
         const ang = (i / bars) * Math.PI * 2;
         const len = base * 0.15 + v * v * Math.min(W, H) * 0.34;
         const c = Math.cos(ang), s = Math.sin(ang);
-        cx.strokeStyle = `hsl(${h0 + (i / bars) * 90} 90% ${45 + v * 30}%)`;
-        cx.lineWidth = (1.2 + v * 3) * DPR;
-        cx.beginPath();
-        cx.moveTo(c * base, s * base);
-        cx.lineTo(c * (base + len), s * (base + len));
-        cx.stroke();
+        if (p.vari === 2) {
+          /* バーの代わりに玉を連ねる */
+          const dots = 2 + Math.floor(v * 5);
+          cx.fillStyle = `hsl(${h0 + (i / bars) * 90} 90% ${45 + v * 30}%)`;
+          for (let d = 0; d < dots; d++) {
+            const rr = base + (len * (d + 1)) / dots;
+            cx.beginPath();
+            cx.arc(c * rr, s * rr, (1 + v * 2.6) * DPR, 0, Math.PI * 2);
+            cx.fill();
+          }
+        } else if (p.vari === 3) {
+          /* 扇形ウェッジで塗る */
+          cx.fillStyle = `hsla(${h0 + (i / bars) * 90} 90% ${45 + v * 30}% / .5)`;
+          cx.beginPath();
+          cx.moveTo(c * base, s * base);
+          cx.arc(0, 0, base + len, ang - Math.PI / bars, ang + Math.PI / bars);
+          cx.closePath();
+          cx.fill();
+        } else {
+          cx.strokeStyle = `hsl(${h0 + (i / bars) * 90} 90% ${45 + v * 30}%)`;
+          cx.lineWidth = (1.2 + v * 3) * DPR;
+          cx.beginPath();
+          cx.moveTo(c * base, s * base);
+          cx.lineTo(c * (base + len), s * (base + len));
+          cx.stroke();
+        }
       }
       /* core */
       cx.beginPath();

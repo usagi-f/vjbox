@@ -15,7 +15,7 @@ function newCube(): Cube {
   };
 }
 
-/** 手前に飛んでくる擬似3Dワイヤーキューブ */
+/** 手前に飛んでくる擬似3Dワイヤーキューブ。vari: 1=ワイヤー / 2=半透明パネル / 3=ダイヤ */
 export const cubes: VisualMode = {
   id: "cubes",
   label: "CUBES",
@@ -51,14 +51,36 @@ export const cubes: VisualMode = {
       cx.strokeStyle = `hsla(${h0 + c.hueOff} 90% 60% / ${al})`;
       cx.lineWidth = (1 + (1 - c.z) * 2 + a.beatEnv * p.punch) * DPR;
       const s2 = s * 0.55;
-      cx.strokeRect(-s / 2, -s / 2, s, s);
-      cx.strokeRect(-s2 / 2, -s2 / 2, s2, s2);
-      cx.beginPath();
-      for (const [dx, dy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
-        cx.moveTo((dx * s) / 2, (dy * s) / 2);
-        cx.lineTo((dx * s2) / 2, (dy * s2) / 2);
+      if (p.vari === 2) {
+        /* 面を持つ半透明パネル */
+        cx.fillStyle = `hsla(${h0 + c.hueOff} 90% 55% / ${al * 0.3})`;
+        cx.fillRect(-s / 2, -s / 2, s, s);
+        cx.strokeRect(-s / 2, -s / 2, s, s);
+      } else if (p.vari === 3) {
+        /* 二重のダイヤ(45度回転の菱形) */
+        cx.beginPath();
+        for (const k of [1, 0.55]) {
+          cx.moveTo(0, (-s * k) / 2);
+          cx.lineTo((s * k) / 2, 0);
+          cx.lineTo(0, (s * k) / 2);
+          cx.lineTo((-s * k) / 2, 0);
+          cx.closePath();
+        }
+        cx.moveTo(0, -s / 2);
+        cx.lineTo(0, s / 2);
+        cx.moveTo(-s / 2, 0);
+        cx.lineTo(s / 2, 0);
+        cx.stroke();
+      } else {
+        cx.strokeRect(-s / 2, -s / 2, s, s);
+        cx.strokeRect(-s2 / 2, -s2 / 2, s2, s2);
+        cx.beginPath();
+        for (const [dx, dy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
+          cx.moveTo((dx * s) / 2, (dy * s) / 2);
+          cx.lineTo((dx * s2) / 2, (dy * s2) / 2);
+        }
+        cx.stroke();
       }
-      cx.stroke();
       cx.restore();
     }
   },

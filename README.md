@@ -6,7 +6,8 @@ No server required. Features 100% client-side processing, ensuring your audio da
 
 ## Features
 
-- **16 Visual Modes** — RADIAL / PRTCL / TUNNEL / WAVE / GRID / LISSA / BURST / RIDGE / SPIRAL / CUBES / PLEXUS / RAIN / GLITCH / BLOB / FLOOR / FLASH
+- **32 Visual Modes** — RADIAL / PRTCL / TUNNEL / WAVE / GRID / LISSA / BURST / RIDGE / SPIRAL / CUBES / PLEXUS / RAIN / GLITCH / BLOB / FLOOR / FLASH / RINGS / STARS / BARS / ORBIT / MESH / SHARD / HELIX / MOIRE / LASER / PETAL / VORTX / COMET / DIAMD / TYPE / PIPES / NEBLA
+- **3 Variations per Mode** — Every mode ships with three distinct sub-looks (e.g. RADIAL: bars / pearls / wedges), switchable from the panel and shuffled by the Autopilot, for 96 base visuals in total.
 - **Global Effects & Parameters** — Blending modes (Add / Screen / Normal / Difference), feedback types (OUT / IN / SPIN / DRIFT / MIR), texture overlays (Scanlines / Halftone), and a beat-synced strobe. Since these layer orthogonally over the visual modes, you can create thousands of unique combinations.
 - **Real-Time GUI Control** — Adjust sensitivity, feedback trails, rotation, density, hue, kaleidoscope mirrors, and more via intuitive sliders.
 - **Autopilot Mode** — Crossfades between visual modes automatically in sync with the beat at specified intervals. While running, parameters continuously and smoothly drift every 2 seconds to keep the performance dynamic.
