@@ -5,7 +5,11 @@ interface Glyph {
 }
 
 const GLYPHS = "アイウエオカキクケコサシスセソタチツテト0123456789ABCDEFXYZ#$%&*+<>▲◆●★";
+/* 極太ゴシック系スタック。太さはフォント指定側の 900 で担保する */
+const FONT = "'Arial Black','Helvetica Neue',Helvetica,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif";
 const glyphs: Glyph[] = [];
+let centerCh = "V";
+let centerPulse = 0;
 
 function pick(): string {
   return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
@@ -28,7 +32,7 @@ export const typo: VisualMode = {
   id: "typo",
   label: "TYPE",
   draw(f) {
-    const { cx, W, H, a, p, t } = f;
+    const { cx, W, H, DPR, a, p, t } = f;
     const h0 = f.hue();
     cx.globalCompositeOperation = p.blend;
     cx.textAlign = "center";
@@ -42,7 +46,7 @@ export const typo: VisualMode = {
       const total = cols * rows;
       const speed = 2 + a.level * p.gain * 14 + a.beatEnv * p.punch * 8;
       const head = Math.floor(t * speed * 0.12) % (total + Math.floor(total * 0.3));
-      cx.font = `bold ${Math.floor(Math.min(cw, chH) * 0.72)}px monospace`;
+      cx.font = `900 ${Math.floor(Math.min(cw, chH) * 0.72)}px ${FONT}`;
       for (let i = 0; i < Math.min(head, total); i++) {
         const gx = (i % cols + 0.5) * cw;
         const gy = (Math.floor(i / cols) + 0.5) * chH;
@@ -61,27 +65,56 @@ export const typo: VisualMode = {
       }
       return;
     }
-    const big = p.vari !== 2;
-    if (a.beat) {
-      const n = big ? 1 : 2 + Math.round(p.punch * 4);
-      for (let i = 0; i < n; i++) glyphs.push(newGlyph(f, big));
+    if (p.vari === 1) {
+      /* 常に居座る中央の巨大文字。ビートで文字が切り替わり、残像エコーを飛ばす */
+      if (a.beat) {
+        centerCh = pick();
+        centerPulse = 1;
+        const n = 1 + Math.round(p.punch * 2);
+        for (let i = 0; i < n; i++) {
+          const echo = newGlyph(f, true);
+          echo.ch = centerCh;
+          glyphs.push(echo);
+        }
+      }
+      centerPulse *= 0.9;
+      const px = Math.min(W, H) * (0.42 + p.dens * 0.2) *
+        (1 + a.bass * p.gain * 0.12 + centerPulse * p.punch * 0.22);
+      cx.save();
+      cx.translate(f.CX, f.CY);
+      cx.rotate(Math.sin(t * 0.01) * 0.05 * (1 + Math.abs(p.rot) * 2));
+      cx.font = `900 ${Math.floor(px)}px ${FONT}`;
+      /* 色収差ふうに3層ずらして重ねる */
+      const split = (2 + centerPulse * p.punch * 16 + a.level * p.gain * 4) * DPR;
+      cx.fillStyle = `hsla(${(h0 + 300) % 360} 90% 55% / .5)`;
+      cx.fillText(centerCh, -split, 0);
+      cx.fillStyle = `hsla(${(h0 + 60) % 360} 90% 55% / .5)`;
+      cx.fillText(centerCh, split, 0);
+      cx.fillStyle = `hsla(${h0} 92% ${62 + centerPulse * 20}% / .92)`;
+      cx.fillText(centerCh, 0, 0);
+      cx.restore();
+    } else if (a.beat) {
+      const n = 2 + Math.round(p.punch * 4);
+      for (let i = 0; i < n; i++) glyphs.push(newGlyph(f, false));
     }
-    if (!big && glyphs.length < 4 + p.dens * 24 && Math.random() < a.treb * p.gain * 0.5) {
+    if (p.vari === 2 && glyphs.length < 4 + p.dens * 24 && Math.random() < a.treb * p.gain * 0.5) {
       glyphs.push(newGlyph(f, false));
     }
     for (let i = glyphs.length - 1; i >= 0; i--) {
       const s = glyphs[i];
-      s.life -= big ? 0.03 : 0.02;
+      s.life -= p.vari === 1 ? 0.045 : 0.02;
       if (s.life <= 0) {
         glyphs.splice(i, 1);
         continue;
       }
-      const px = s.sz * Math.min(W, H) * (1 + (1 - s.life) * 0.25 + a.beatEnv * p.punch * 0.1);
+      /* vari1 のエコーは拡大しながら薄れて飛んでいく */
+      const grow = p.vari === 1 ? 1 + (1 - s.life) * 1.2 : 1 + (1 - s.life) * 0.25;
+      const px = s.sz * Math.min(W, H) * grow * (1 + a.beatEnv * p.punch * 0.1);
       cx.save();
       cx.translate(s.x, s.y);
       cx.rotate(s.rot * (1 - s.life));
-      cx.font = `bold ${Math.floor(px)}px monospace`;
-      cx.fillStyle = `hsla(${h0 + s.hueOff} 92% ${55 + s.life * 25}% / ${s.life})`;
+      cx.font = `900 ${Math.floor(px)}px ${FONT}`;
+      cx.fillStyle = `hsla(${h0 + s.hueOff} 92% ${55 + s.life * 25}% / ${s.life * (p.vari === 1 ? 0.5 : 1)})`;
       cx.fillText(s.ch, 0, 0);
       cx.restore();
     }

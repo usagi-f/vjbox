@@ -65,8 +65,8 @@ export const floor: VisualMode = {
       cx.beginPath();
       cx.moveTo(0, y);
       cx.lineTo(W, y);
-      if (p.vari === 3) {
-        /* 天井側にも同じ線を映す */
+      if (p.vari === 3 && i % 2 === 0) {
+        /* 天井側にも線を映す(負荷を抑えるため1本おき) */
         const yc = horizon - horizon * fr * fr;
         cx.moveTo(0, yc);
         cx.lineTo(W, yc);
@@ -82,7 +82,7 @@ export const floor: VisualMode = {
       cx.beginPath();
       cx.moveTo(f.CX + fr * W * 0.06, horizon);
       cx.lineTo(f.CX + fr * W * 2.3, H);
-      if (p.vari === 3) {
+      if (p.vari === 3 && i % 2 === 0) {
         cx.moveTo(f.CX + fr * W * 0.06, horizon);
         cx.lineTo(f.CX + fr * W * 2.3, 0);
       }

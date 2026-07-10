@@ -26,9 +26,10 @@ export const lasers: VisualMode = {
       cx.stroke();
     };
     if (p.vari === 2) {
-      /* 左右下角から交差するビーム */
-      for (let i = 0; i < beams; i++) {
-        const fr = i / (beams - 1);
+      /* 左右下角から交差するビーム(両側で2倍になるため本数は半分にして負荷を揃える) */
+      const half = Math.max(3, Math.ceil(beams / 2));
+      for (let i = 0; i < half; i++) {
+        const fr = i / (half - 1);
         const fi = Math.floor(fr * freq.length * 0.5);
         const v = Math.min(1, (freq[fi] / 255) * g);
         const spread = 0.55 + sweep * 0.2 + v * 0.2;

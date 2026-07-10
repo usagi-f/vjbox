@@ -68,6 +68,7 @@ export const plexus: VisualMode = {
     cx.lineWidth = 0.8 * DPR;
     for (let i = 0; i < nodes.length; i++) {
       const na = nodes[i];
+      let links = 0;
       for (let j = i + 1; j < nodes.length; j++) {
         const nb = nodes[j];
         const dx = na.x - nb.x, dy = na.y - nb.y;
@@ -79,6 +80,8 @@ export const plexus: VisualMode = {
         cx.moveTo(na.x, na.y);
         cx.lineTo(nb.x, nb.y);
         cx.stroke();
+        /* 密集時にリンク数が二乗で爆発しないよう1ノードあたりの本数を制限 */
+        if (++links >= 6) break;
       }
       cx.fillStyle = `hsla(${h0 + na.hueOff} 90% 65% / .9)`;
       cx.beginPath();

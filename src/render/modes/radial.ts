@@ -17,7 +17,8 @@ export const radial: VisualMode = {
       cx.globalCompositeOperation = p.blend;
       for (let i = 0; i < bars; i++) {
         const fi = Math.floor(Math.pow(i / bars, 1.6) * freq.length * 0.7);
-        const v = (freq[fi] / 255) * p.gain;
+        /* 高感度時にバーの長さ・太さが際限なく伸びて描画負荷が爆発しないようクランプ */
+        const v = Math.min(1.35, (freq[fi] / 255) * p.gain);
         const ang = (i / bars) * Math.PI * 2;
         const len = base * 0.15 + v * v * Math.min(W, H) * 0.34;
         const c = Math.cos(ang), s = Math.sin(ang);

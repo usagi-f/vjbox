@@ -31,6 +31,9 @@ export const rings: VisualMode = {
     if (ripples.length < 3 + p.dens * 10 && Math.random() < 0.06 + a.level * 0.2) {
       ripples.push(newRipple(f, centered));
     }
+    /* ビート連打でリングが無限に積み上がらないよう上限を設ける(古いものから捨てる) */
+    const maxRipples = 12 + Math.floor(p.dens * 12);
+    if (ripples.length > maxRipples) ripples.splice(0, ripples.length - maxRipples);
     const h0 = f.hue();
     const maxR = Math.hypot(W, H) * 0.55;
     cx.globalCompositeOperation = p.blend;
