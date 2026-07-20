@@ -17,7 +17,7 @@ function newRay(f: Frame, hard: boolean): Ray {
   };
 }
 
-/** 中心から飛び出すスピードライン。残像高めでワープ感 */
+/** 中心から飛び出すスピードライン。vari: 1=ライン / 2=彗星 / 3=破片 */
 export const burst: VisualMode = {
   id: "burst",
   label: "BURST",
@@ -45,12 +45,44 @@ export const burst: VisualMode = {
       const fade = 1 - r.r / maxR;
       const len = r.len * (0.35 + a.level * p.gain);
       const c = Math.cos(r.a), s = Math.sin(r.a);
-      cx.strokeStyle = `hsla(${h0 + r.hueOff} 90% ${55 + fade * 20}% / ${fade * 0.9})`;
-      cx.lineWidth = r.w * (1 + a.beatEnv * p.punch) * DPR;
-      cx.beginPath();
-      cx.moveTo(c * r.r, s * r.r);
-      cx.lineTo(c * (r.r + len), s * (r.r + len));
-      cx.stroke();
+      if (p.vari === 2) {
+        /* 尾を引く彗星: グラデ線 + 光る頭 */
+        const grad = cx.createLinearGradient(c * r.r, s * r.r, c * (r.r + len), s * (r.r + len));
+        grad.addColorStop(0, `hsla(${h0 + r.hueOff} 90% 55% / 0)`);
+        grad.addColorStop(1, `hsla(${h0 + r.hueOff} 90% 65% / ${fade})`);
+        cx.strokeStyle = grad;
+        cx.lineWidth = r.w * (1 + a.beatEnv * p.punch) * DPR;
+        cx.beginPath();
+        cx.moveTo(c * r.r, s * r.r);
+        cx.lineTo(c * (r.r + len), s * (r.r + len));
+        cx.stroke();
+        cx.fillStyle = `hsla(${h0 + r.hueOff} 95% 75% / ${fade})`;
+        cx.beginPath();
+        cx.arc(c * (r.r + len), s * (r.r + len), r.w * (1.2 + a.beatEnv * p.punch) * DPR, 0, Math.PI * 2);
+        cx.fill();
+      } else if (p.vari === 3) {
+        /* 回転しながら飛ぶ三角形の破片 */
+        const sz = r.w * (3 + fade * 4) * DPR;
+        cx.save();
+        cx.translate(c * (r.r + len * 0.5), s * (r.r + len * 0.5));
+        cx.rotate(r.a + r.r * 0.02);
+        cx.strokeStyle = `hsla(${h0 + r.hueOff} 90% ${55 + fade * 20}% / ${fade * 0.9})`;
+        cx.lineWidth = (1 + a.beatEnv * p.punch) * DPR;
+        cx.beginPath();
+        cx.moveTo(sz, 0);
+        cx.lineTo(-sz * 0.6, sz * 0.7);
+        cx.lineTo(-sz * 0.6, -sz * 0.7);
+        cx.closePath();
+        cx.stroke();
+        cx.restore();
+      } else {
+        cx.strokeStyle = `hsla(${h0 + r.hueOff} 90% ${55 + fade * 20}% / ${fade * 0.9})`;
+        cx.lineWidth = r.w * (1 + a.beatEnv * p.punch) * DPR;
+        cx.beginPath();
+        cx.moveTo(c * r.r, s * r.r);
+        cx.lineTo(c * (r.r + len), s * (r.r + len));
+        cx.stroke();
+      }
     }
     cx.restore();
   },

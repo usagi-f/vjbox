@@ -22,7 +22,7 @@ function newShape(f: Frame, big: boolean): Shape {
   };
 }
 
-/** ビートで幾何学図形がフラッシュするクラブVJ定番 */
+/** ビートで幾何学図形がフラッシュするクラブVJ定番。vari: 1=線画 / 2=塗り / 3=波紋リング */
 export const flash: VisualMode = {
   id: "flash",
   label: "FLASH",
@@ -46,12 +46,24 @@ export const flash: VisualMode = {
         shapes.splice(i, 1);
         continue;
       }
-      const sz = s.sz * Math.min(W, H) * s.sc;
+      const sz = s.sz * Math.min(W, H) * s.sc * (p.vari === 3 ? 1.4 : 1);
       cx.save();
       cx.translate(s.x, s.y);
       cx.rotate(s.rot);
       cx.strokeStyle = `hsla(${h0 + s.hueOff} 92% ${55 + s.life * 25}% / ${s.life})`;
       cx.lineWidth = (2 + s.life * 5) * DPR;
+      if (p.vari === 3) {
+        /* 図形の代わりに波紋リングが広がる */
+        cx.beginPath();
+        cx.arc(0, 0, sz / 2, 0, Math.PI * 2);
+        cx.stroke();
+        cx.lineWidth = (1 + s.life * 2.5) * DPR;
+        cx.beginPath();
+        cx.arc(0, 0, sz * 0.34, 0, Math.PI * 2);
+        cx.stroke();
+        cx.restore();
+        continue;
+      }
       cx.beginPath();
       if (s.type === 0) {
         cx.arc(0, 0, sz / 2, 0, Math.PI * 2);
@@ -69,6 +81,11 @@ export const flash: VisualMode = {
         cx.lineTo(sz / 2, 0);
         cx.moveTo(0, -sz / 2);
         cx.lineTo(0, sz / 2);
+      }
+      if (p.vari === 2 && s.type !== 3) {
+        /* 面で塗ってから輪郭を重ねる */
+        cx.fillStyle = `hsla(${h0 + s.hueOff} 92% 55% / ${s.life * 0.4})`;
+        cx.fill();
       }
       cx.stroke();
       cx.restore();

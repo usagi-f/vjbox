@@ -16,6 +16,8 @@ export interface Params {
   punch: number;
   strobe: number;
   sym: number;
+  /** モードごとの描画バリエーション (1〜3) */
+  vari: number;
   blend: BlendMode;
   fbStyle: FbStyle;
   tex: TexStyle;
@@ -24,18 +26,20 @@ export interface Params {
 export type NumKey =
   | "gain" | "trail" | "fb" | "rot" | "dens"
   | "hue" | "flow" | "punch" | "strobe";
-export type DiscreteKey = "sym" | "blend" | "fbStyle" | "tex";
+export type DiscreteKey = "sym" | "vari" | "blend" | "fbStyle" | "tex";
 
 export const P: Params = {
   mode: "radial",
   gain: 1.2, trail: 0.7, fb: 0, rot: 0.2, dens: 0.5,
   hue: 190, flow: 0.3, punch: 0.6, strobe: 0,
   sym: 1,
+  vari: 1,
   blend: "lighter", fbStyle: "out", tex: "off",
 };
 
 export const OPTIONS = {
   sym: [1, 2, 4, 6],
+  vari: [1, 2, 3],
   blend: ["lighter", "screen", "source-over", "difference"],
   fbStyle: ["out", "in", "spin", "drift", "mir"],
   tex: ["off", "scan", "dot"],
